@@ -108,7 +108,7 @@ fun BufferedSink.write(s: String): BufferedSink = writeUtf8(s)
 
 fun BufferedSink.writeln(s: String): BufferedSink = write(s).writeByte(10) // 10 is '\n'
 
-fun <R> BufferedSink.useWith(block: BufferedSink.() -> R): R = use(block)
+fun <T : AutoCloseable, R> T.useWith(block: T.() -> R): R = use(block)
 
 fun copyFile(source: File, destination: File) {
     // Note: destination folder existence must be ensured externally!

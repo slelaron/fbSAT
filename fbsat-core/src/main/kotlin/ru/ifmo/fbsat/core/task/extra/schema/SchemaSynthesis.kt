@@ -1,4 +1,4 @@
-package ru.ifmo.fbsat.core.task.extra
+package ru.ifmo.fbsat.core.task.extra.schema
 
 import com.github.lipen.multiarray.MultiArray
 import com.soywiz.klock.PerformanceCounter
@@ -21,6 +21,7 @@ import ru.ifmo.fbsat.core.utils.timeSince
 import ru.ifmo.fbsat.core.utils.toBinaryString
 import ru.ifmo.fbsat.core.utils.toBooleanArray
 import ru.ifmo.fbsat.core.utils.toList_
+import ru.ifmo.fbsat.core.utils.useWith
 import ru.ifmo.fbsat.core.utils.writeln
 import java.io.File
 import kotlin.math.pow
@@ -349,9 +350,7 @@ fun synthesizeSchema(tt: Map<Input, Output>, M: Int, X: Int, Z: Int): Boolean {
     return false
 }
 
-fun <T : AutoCloseable, R> T.useWith(block: T.() -> R): R = use(block)
-
-fun synthesizeIterativeBottomUp(tt: Map<Input, Output>, X: Int, Z: Int) {
+ fun synthesizeSchemaIterativelyBottomUp(tt: Map<Input, Output>, X: Int, Z: Int) {
     for (M in 1..30) {
         log.br()
         log.info("Trying M = $M...")
@@ -384,17 +383,17 @@ fun main() {
     log.success("All done in %.3f s.".format(timeSince(timeStart).seconds))
 }
 
-fun Int.pow(n: Int): Int =
+private fun Int.pow(n: Int): Int =
     if (this == 2) 1 shl n
     else this.toDouble().pow(n).toInt()
 
-fun Long.pow(n: Int): Long =
+private fun Long.pow(n: Int): Long =
     if (this == 2L) 1L shl n
     else this.toDouble().pow(n).toLong()
 
 private fun Boolean.toInt(): Int = if (this) 1 else 0
 
-fun valuesToTruthTable(values: List<Boolean?>, X: Int): Map<Input, Boolean> {
+private fun valuesToTruthTable(values: List<Boolean?>, X: Int): Map<Input, Boolean> {
     val tt: MutableMap<Input, Boolean> = mutableMapOf()
     for ((i, b) in values.withIndex()) {
         if (b != null) {
@@ -405,7 +404,7 @@ fun valuesToTruthTable(values: List<Boolean?>, X: Int): Map<Input, Boolean> {
 }
 
 @Suppress("LocalVariableName")
-fun String.toTruthTable(X: Int): Map<Input, Boolean> {
+private fun String.toTruthTable(X: Int): Map<Input, Boolean> {
     val values = map {
         when (it) {
             '0' -> false
@@ -418,7 +417,7 @@ fun String.toTruthTable(X: Int): Map<Input, Boolean> {
 }
 
 @Suppress("LocalVariableName")
-fun ttToBinaryString(tt: Map<Input, Boolean>): String {
+private fun ttToBinaryString(tt: Map<Input, Boolean>): String {
     val X = tt.keys.first().values.size
     return (0 until 2.pow(X)).joinToString("") { f -> tt[Input(f, X)]?.toInt()?.toString() ?: "x" }
 }
