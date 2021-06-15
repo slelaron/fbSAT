@@ -1,0 +1,1 @@
+for i in `ls logs/*.gz`; do dir=`gzip -cd $i | grep -o -P "outDir = .*$" - | cut -d " " -f 3- -`; if [ -d "$dir" ]; then printf "%s %s%04d %s\n" $dir $(echo $i | cut -d _ -f 2) $(echo $i | cut -d . -f 1 | cut -d _ -f 3) $i; fi; done | sort -r | sort -r -s -u -k 1,1 -t " " | cut -d " " -f 1,3

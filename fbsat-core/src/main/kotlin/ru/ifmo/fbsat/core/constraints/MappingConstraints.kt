@@ -6,19 +6,7 @@ import com.github.lipen.multiarray.MultiArray
 import com.github.lipen.satlib.core.BoolVarArray
 import com.github.lipen.satlib.core.IntVarArray
 import com.github.lipen.satlib.core.sign
-import com.github.lipen.satlib.op.atLeastOne
-import com.github.lipen.satlib.op.atMostOne
-import com.github.lipen.satlib.op.iff
-import com.github.lipen.satlib.op.iffAnd
-import com.github.lipen.satlib.op.iffImply
-import com.github.lipen.satlib.op.iffOr
-import com.github.lipen.satlib.op.imply
-import com.github.lipen.satlib.op.implyAnd
-import com.github.lipen.satlib.op.implyIff
-import com.github.lipen.satlib.op.implyIffAnd
-import com.github.lipen.satlib.op.implyIffIte
-import com.github.lipen.satlib.op.implyImply
-import com.github.lipen.satlib.op.implyImplyImply
+import com.github.lipen.satlib.op.*
 import com.github.lipen.satlib.op.implyOr
 import com.github.lipen.satlib.solver.Solver
 import ru.ifmo.fbsat.core.scenario.ScenarioTree
@@ -28,10 +16,7 @@ import ru.ifmo.fbsat.core.solver.autoneg
 import ru.ifmo.fbsat.core.solver.clause
 import ru.ifmo.fbsat.core.solver.forEachModularContext
 import ru.ifmo.fbsat.core.task.modular.basic.arbitrary.Pins
-import ru.ifmo.fbsat.core.utils.MyLogger
-import ru.ifmo.fbsat.core.utils.algorithmChoice
-import ru.ifmo.fbsat.core.utils.exhaustive
-import ru.ifmo.fbsat.core.utils.withIndex
+import ru.ifmo.fbsat.core.utils.*
 
 private val logger = MyLogger {}
 
@@ -137,9 +122,16 @@ fun Solver.declareNegativeMappingConstraints(
         )
     }
 
+    val negV: Int = context["negV"]
+    val forbiddenStates: MutableSet<Int> = context["forbiddenStates"]
+    for (v in 1..negV)
+        if (negativeScenarioTree.isFinal(v) && forbiddenStates.add(v)) {
+            addClause(negMapping[v] eq 0)
+        }
+
+
     if (isForbidLoops) {
         val C: Int = context["C"]
-        val negV: Int = context["negV"]
         val forbiddenLoops: MutableSet<Pair<Int, Int>> = context["forbiddenLoops"]
 
         comment("Forbid loops")
